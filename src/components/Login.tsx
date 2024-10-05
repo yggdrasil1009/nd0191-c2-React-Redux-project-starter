@@ -1,6 +1,6 @@
 import { useEffect, useState, FormEvent } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Container,
   TextField,
@@ -25,6 +25,7 @@ const Login = () => {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Fetch all users info
   useEffect(() => {
@@ -40,10 +41,12 @@ const Login = () => {
 
     if (selectedUser && password) {
       const user = users.filter((u) => u.id === selectedUser)[0] || null;
+      const from = location.state?.from?.pathname || "/";
 
       if (user && user.password === password) {
         dispatch(login(user)); // Store user info in redux
-        navigate("/");
+        // After login, redirect to the page the user tried to visit or home
+        navigate(from, { replace: true });
       } else {
         setError(t("err.incorrectPassword"));
       }

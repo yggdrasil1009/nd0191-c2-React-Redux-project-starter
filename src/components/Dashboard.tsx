@@ -11,6 +11,8 @@ import {
   Grid,
   Card,
   CardContent,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 
 const Dashboard = () => {
@@ -19,6 +21,7 @@ const Dashboard = () => {
     []
   );
   const [answeredQuestions, setAnsweredQuestions] = useState<Question[]>([]);
+  const [showAnswered, setShowAnswered] = useState(false); // Toggle state to show answered or unanswered questions
 
   // Get user info from redux store
   const userLogin = useSelector((state: any) => state.auth.user);
@@ -56,6 +59,7 @@ const Dashboard = () => {
     navigate(`/questions/${id}`);
   };
 
+  // Render questions based on current toggle view
   const renderQuestions = (questions: Question[]) =>
     questions.map((question) => (
       <Grid item xs={12} sm={6} md={4} key={question.id}>
@@ -84,22 +88,43 @@ const Dashboard = () => {
   return (
     <Box>
       <Box sx={{ flexGrow: 1, p: 4 }}>
+        {/* Toggle buttons to switch between Answered and Unanswered questions */}
+        <ToggleButtonGroup
+          value={showAnswered}
+          exclusive
+          onChange={(event, newValue) => setShowAnswered(newValue)}
+          aria-label="question toggle"
+          sx={{ marginBottom: 2 }}
+        >
+          <ToggleButton value={false} aria-label="unanswered">
+            New Questions
+          </ToggleButton>
+          <ToggleButton value={true} aria-label="answered">
+            Done
+          </ToggleButton>
+        </ToggleButtonGroup>
+
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Typography variant="h5" gutterBottom>
-              New Questions
-            </Typography>
-            <Grid container spacing={2}>
-              {renderQuestions(unansweredQuestions)}
-            </Grid>
-          </Grid>
-          <Grid item xs={12} mt={4}>
-            <Typography variant="h5" gutterBottom>
-              Done
-            </Typography>
-            <Grid container spacing={2}>
-              {renderQuestions(answeredQuestions)}
-            </Grid>
+            {showAnswered ? (
+              <>
+                <Typography variant="h5" gutterBottom>
+                  Done
+                </Typography>
+                <Grid container spacing={2}>
+                  {renderQuestions(answeredQuestions)}
+                </Grid>
+              </>
+            ) : (
+              <>
+                <Typography variant="h5" gutterBottom>
+                  New Questions
+                </Typography>
+                <Grid container spacing={2}>
+                  {renderQuestions(unansweredQuestions)}
+                </Grid>
+              </>
+            )}
           </Grid>
         </Grid>
       </Box>

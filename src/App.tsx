@@ -1,20 +1,17 @@
 import { Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
+import { RootState } from "./reducers/store";
 import Dashboard from "./components/Dashboard";
 import Navbar from "./components/NavBar";
 import PollDetails from "./components/PollDetails";
 import Login from "./components/Login";
-import { Navigate } from "react-router-dom";
 import AddPoll from "./components/AddPoll";
 import Leaderboard from "./components/LeaderBoard";
+import PrivateRoute from "./components/PrivateRoute";
 
-const PrivateRoute = ({ children }) => {
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-  return isAuthenticated ? children : <Navigate to="/login" />;
-};
-
-const App = () => {
-  const userLogin = useSelector((state) => state.auth.user);
+const App: React.FC = () => {
+  const userLogin = useSelector((state: RootState) => state.auth.user);
 
   return (
     <div>
@@ -24,8 +21,10 @@ const App = () => {
           path="/"
           element={
             <PrivateRoute>
-              {userLogin && <Navbar userLogin={userLogin} />}
-              <Dashboard />
+              <>
+                {userLogin && <Navbar userLogin={userLogin} />}
+                <Dashboard />
+              </>
             </PrivateRoute>
           }
         />
@@ -33,8 +32,10 @@ const App = () => {
           path="/questions/:question_id"
           element={
             <PrivateRoute>
-              {userLogin && <Navbar userLogin={userLogin} />}
-              <PollDetails />
+              <>
+                {userLogin && <Navbar userLogin={userLogin} />}
+                <PollDetails />
+              </>
             </PrivateRoute>
           }
         />
@@ -42,8 +43,10 @@ const App = () => {
           path="/leaderboard"
           element={
             <PrivateRoute>
-              {userLogin && <Navbar userLogin={userLogin} />}
-              <Leaderboard />
+              <>
+                {userLogin && <Navbar userLogin={userLogin} />}
+                <Leaderboard />
+              </>
             </PrivateRoute>
           }
         />
@@ -51,8 +54,10 @@ const App = () => {
           path="/new"
           element={
             <PrivateRoute>
-              {userLogin && <Navbar userLogin={userLogin} />}
-              <AddPoll />
+              <>
+                {userLogin && <Navbar userLogin={userLogin} />}
+                <AddPoll />
+              </>
             </PrivateRoute>
           }
         />

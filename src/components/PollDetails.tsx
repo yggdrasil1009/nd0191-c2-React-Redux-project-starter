@@ -29,44 +29,41 @@ const PollDetails = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    // If user is not logged in, redirect to login
-    if (!userLogin) {
-      navigate("/login");
-    }
-
-    if (question_id) {
+    if (userLogin && question_id) {
       // Fetch the poll data based on question_id
       _getQuestions().then((questions) => {
         const question = questions[question_id];
         if (!question) {
           setNotFound(true);
+          setLoading(false);
+          return;
         } else {
           setPoll(question);
-        }
 
-        if (userLogin && question.author === userLogin.id) {
-          setAvtAuthor(userLogin.avatarURL.slice(1));
-        } else {
-          _getUsers().then((allUsers: Record<string, User>) => {
-            const usersArray = Object.values(allUsers);
-            // Find the user who matches the question's author
-            const authorUser = usersArray.find(
-              (user) => user.id === question.author
-            );
+          if (userLogin && question.author === userLogin.id) {
+            setAvtAuthor(userLogin.avatarURL.slice(1));
+          } else {
+            _getUsers().then((allUsers: Record<string, User>) => {
+              const usersArray = Object.values(allUsers);
+              // Find the user who matches the question's author
+              const authorUser = usersArray.find(
+                (user) => user.id === question.author
+              );
 
-            if (authorUser) {
-              setAvtAuthor(authorUser.avatarURL.slice(1)); // Set the avatar if the author is found
-            } else {
-              setAvtAuthor(""); // Set an empty avatar
+              if (authorUser) {
+                setAvtAuthor(authorUser.avatarURL.slice(1)); // Set the avatar if the author is found
+              } else {
+                setAvtAuthor(""); // Set an empty avatar
+              }
+            });
+          }
+
+          if (userLogin) {
+            if (question.optionOne.votes.includes(userLogin.id)) {
+              setSelectedOption("optionOne");
+            } else if (question.optionTwo.votes.includes(userLogin.id)) {
+              setSelectedOption("optionTwo");
             }
-          });
-        }
-
-        if (userLogin) {
-          if (question.optionOne.votes.includes(userLogin.id)) {
-            setSelectedOption("optionOne");
-          } else if (question.optionTwo.votes.includes(userLogin.id)) {
-            setSelectedOption("optionTwo");
           }
         }
 
@@ -91,7 +88,17 @@ const PollDetails = () => {
 
   if (loading) return <LinearProgress />; // Show loading spinner
   if (notFound)
-    return <Typography variant="h4">404 - Poll Not Found</Typography>; // Show 404 if poll not found
+    return (
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        height="100vh"
+      >
+        <Typography variant="h4">404 - Poll Not Found</Typography>
+      </Box>
+    ); // Show 404 if poll not found
 
   const totalVotes = poll.optionOne.votes.length + poll.optionTwo.votes.length;
   const optionOnePercentage = (
