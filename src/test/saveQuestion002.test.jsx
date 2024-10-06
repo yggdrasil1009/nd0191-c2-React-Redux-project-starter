@@ -1,4 +1,4 @@
-import { _saveQuestion } from "database/_DATA";
+import { _saveQuestion } from "../database/_DATA";
 
 describe("_saveQuestion", () => {
   it("should return a saved question with all expected fields when valid data is provided", async () => {
